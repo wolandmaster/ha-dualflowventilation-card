@@ -24,3 +24,8 @@ TODO
 ## Usage
 
 TODO
+
+## Test
+
+By running the test.sh script, you can launch a Home Assistant instance in Docker to test the Dual Flow Ventilation Card.
+The URL is http://localhost:8123/ and the credentials are: test/test.

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace_resources",
+  "data": {
+    "items": [
+      {
+        "id": "82f1b192cdfc4d9c82b96957c546ede1",
+        "url": "/local/dual-flow-ventilation-card.js",
+        "type": "module"
+      }
+    ]
+  }
+}

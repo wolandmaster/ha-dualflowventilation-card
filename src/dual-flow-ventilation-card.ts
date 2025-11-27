@@ -2,7 +2,7 @@ import { LitElement, html, css, CSSResultGroup, TemplateResult } from "lit";
 import { customElement, } from "lit/decorators.js";
 import { DualFlowVentilationCardConfig } from "./dual-flow-ventilation-card-config";
 import { DualFlowVentilationCardEditor } from "./dual-flow-ventilation-card-editor";
-  
+
 @customElement('dual-flow-ventilation-card')
 export class DualFlowVentilationCard extends LitElement {
 
@@ -23,8 +23,8 @@ export class DualFlowVentilationCard extends LitElement {
 
     /*
     static getStubConfig() : Promise<DualFlowVentilationCardConfig> {
-        return 
-        { 
+        return
+        {
         }
     }
     */
@@ -39,7 +39,7 @@ export class DualFlowVentilationCard extends LitElement {
 
         (event as any).detail = {
             entityId: entity,
-        };  
+        };
 
         this.dispatchEvent(event);
 
@@ -62,7 +62,7 @@ export class DualFlowVentilationCard extends LitElement {
     private renderExchangerState() {
         return html `
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="50" height="50" viewBox="0 0 50 50" xml:space="preserve">
-               
+
                 <desc>Created with Fabric.js 4.6.0</desc>
 
                 <g transform="matrix(0.62 0 0 0.53 24 25)" id="tRjiNB6GNj8ZKCBHF_5um"  >
@@ -85,7 +85,7 @@ export class DualFlowVentilationCard extends LitElement {
                 <path style="stroke: rgb(49,168,247); stroke-width: 4; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(0, 0)" d="M -110 40 L -90 40 L 90 -40 L 110 -40" stroke-linecap="round" />
                 </g>
 
-            </svg>       
+            </svg>
         `;
     }
 
@@ -95,7 +95,8 @@ export class DualFlowVentilationCard extends LitElement {
             return html``;
         }
 
-        const currentPreset = this.hass.states[this.config.current_preset_entity].state;
+        const currentPresetEntity = this.hass.states[this.config.current_preset_entity];
+        const currentPreset = currentPresetEntity ? currentPresetEntity.state : '';
 
         const presets = [
             { preset: 'Away', icon: 'home-off-outline' },
@@ -145,16 +146,16 @@ export class DualFlowVentilationCard extends LitElement {
                                 </div>`)}
                         </div>
                     </div>
-                    
+
                     <div class="dfvc-profiles">
                         ${presets.map(i =>  html`
-                            <button class="${ currentPreset == i.preset ? 'selected' : '' }" 
+                            <button class="${ currentPreset == i.preset ? 'selected' : '' }"
                                 @click=${() => this.setPresetMode(i.preset)}><ha-icon icon="mdi:${i.icon}"></ha-icon>${i.preset}
                             </button>`)}
                     </div>
                 </div>
             </ha-card>`;
-    } 
+    }
 
     // The user supplied configuration. Throw an exception and Lovelace will
     // render an error card.
@@ -172,7 +173,7 @@ export class DualFlowVentilationCard extends LitElement {
         if (!this.config || !this.hass || !this.config.fan_entity) return;
 
         console.log(`Changing preset to ${preset}`);
-        this.hass.callService('fan', 'set_preset_mode', { preset_mode: preset }, { entity_id: this.config.fan_entity }); 
+        this.hass.callService('fan', 'set_preset_mode', { preset_mode: preset }, { entity_id: this.config.fan_entity });
     }
 
     static get styles() {
@@ -201,10 +202,10 @@ export class DualFlowVentilationCard extends LitElement {
             .dfvc-temperatures > .dfvc-temperatures-center {
                 width: 50px;
                 height: 50px;
-            }        
+            }
             .dfvc-cells-state {
                 text-align: center;
-            }            
+            }
             .dfvc-temperatures-left > div, .dfvc-temperatures-right > div {
                 padding: 10px;
             }
@@ -267,3 +268,11 @@ export class DualFlowVentilationCard extends LitElement {
         `;
     }
 }
+
+// Register the card with Home Assistant
+(window as any).customCards = (window as any).customCards || [];
+(window as any).customCards.push({
+    type: 'dual-flow-ventilation-card',
+    name: 'Dual Flow Ventilation Card',
+    description: 'A card for dual flow ventilation systems'
+});

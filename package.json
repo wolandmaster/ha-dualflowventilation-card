@@ -11,7 +11,7 @@
   "author": "Colin Gebski",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ColinGski/ha-dualflowventilation-card"
+    "url": "https://github.com/wolandmaster/ha-dualflowventilation-card"
   },
   "dependencies": {
     "lit": "^2.6.1"

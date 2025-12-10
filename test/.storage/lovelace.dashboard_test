@@ -13,10 +13,31 @@
               "cards": [
                 {
                   "type": "heading",
-                  "heading": "New section"
+                  "heading": "Test section"
                 },
                 {
-                  "type": "custom:dual-flow-ventilation-card"
+                  "type": "custom:dual-flow-ventilation-card",
+                  "outdoor_air_entity": "input_number.outdoor_air",
+                  "supply_air_entity": "input_number.supply_air",
+                  "extract_air_entity": "input_number.extract_air",
+                  "exhaust_air_entity": "input_number.exhaust_air",
+                  "fan_speed_entity": "input_number.fan_speed",
+                  "humidity_entity": "input_number.humidity",
+                  "efficiency_entity": "input_number.efficiency",
+                  "cell_state_entity": "input_text.cell_state",
+                  "current_preset_entity": "input_text.fan",
+                  "fan_entity": [
+                    {
+                      "target": {
+                        "entity_id": "input_text.fan"
+                      },
+                      "action": "input_text.set_value",
+                      "metadata": {},
+                      "data": {
+                        "value": "value"
+                      }
+                    }
+                  ]
                 }
               ]
             }

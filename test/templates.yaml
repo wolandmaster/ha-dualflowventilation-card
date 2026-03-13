@@ -1,0 +1,24 @@
+- fan:
+    - name: Ventilation unit
+      unique_id: 9f3854a3-3cd9-48b0-a917-99d10bfbeb20
+      state: "{{ 'on' }}"
+      turn_on: []
+      turn_off: []
+      percentage: "{{ states('input_number.speed') }}"
+      set_percentage:
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.speed
+          data:
+            value: "{{ percentage }}"
+      preset_mode: "{{ states('input_select.preset_mode') }}"
+      set_preset_mode:
+        - action: input_select.select_option
+          target:
+            entity_id: input_select.preset_mode
+          data:
+            option: "{{ preset_mode }}"
+      preset_modes:
+        - Away
+        - Home
+        - Boost

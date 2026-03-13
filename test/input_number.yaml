@@ -1,0 +1,63 @@
+extract_air:
+  name: "Extract air"
+  min: -10.0
+  max: 50.0
+  step: 0.1
+  initial: 19.6
+  mode: "slider"
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer"
+outdoor_air:
+  name: "Outdoor air"
+  min: -10.0
+  max: 50.0
+  step: 0.1
+  initial: 4.0
+  mode: "slider"
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer"
+supply_air:
+  name: "Supply air"
+  min: -10.0
+  max: 50.0
+  step: 0.1
+  initial: 18.5
+  mode: "slider"
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer"
+exhaust_air:
+  name: "Exhaust air"
+  min: -10.0
+  max: 50.0
+  step: 0.1
+  initial: 6.8
+  mode: "slider"
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer"
+speed:
+  name: "Speed"
+  min: 0
+  max: 100
+  step: 5
+  initial: 30
+  mode: "slider"
+  unit_of_measurement: "%"
+  icon: "mdi:fan"
+humidity:
+  name: "Humidity"
+  min: 0
+  max: 100
+  step: 1
+  initial: 43
+  mode: "slider"
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+efficiency:
+  name: "Efficiency"
+  min: 0.0
+  max: 100.0
+  step: 0.1
+  initial: 92.9
+  mode: "slider"
+  unit_of_measurement: "%"
+  icon: "mdi:swap-horizontal"

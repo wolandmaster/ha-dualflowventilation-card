@@ -11,181 +11,225 @@ export class DualFlowVentilationCard extends LitElement {
 
     static get properties() {
         return {
-          hass: {},
-          config: {},
+            hass: {},
+            config: {},
         };
-      }
+    }
 
     public static async getConfigElement() : Promise<DualFlowVentilationCardEditor> {
         await import("./dual-flow-ventilation-card-editor");
         return document.createElement('dual-flow-ventilation-card-editor') as DualFlowVentilationCardEditor;
     }
 
-    /*
-    static getStubConfig() : Promise<DualFlowVentilationCardConfig> {
-        return
-        {
-        }
+    static async getStubConfig() : Promise<DualFlowVentilationCardConfig> {
+        return {}
     }
-    */
 
-    private showEntityInfo(entity)
-    {
+    setConfig(config : DualFlowVentilationCardConfig) {
+        this.config = config;
+    }
+
+    getCardSize() {
+        return 3;
+    }
+
+    private getStateValue(entityId?: string): number {
+        const value = parseFloat(entityId ? this.hass.states[entityId]?.state : "");
+        return isNaN(value) ? 0 : value;
+    }
+
+    private getEntityAttribute(entityId: string, attribute: string): string {
+        return this.hass.states[entityId]?.attributes[attribute] ?? "";
+    }
+
+    private getEntityValue(entityId: string): string {
+        const unit = this.getEntityAttribute(entityId, "unit_of_measurement");
+        return `${this.hass.states[entityId]?.state ?? ""} ${unit}`.trim()
+    }
+
+    private getEntityIcon(entityId: string): string {
+        const domain = entityId.split(".")[0];
+        return this.getEntityAttribute(entityId, "icon") ||
+            {
+                carbon_dioxide: "mdi:molecule-co2", moisture: "mdi:water-percent",
+                problem: "mdi:alert-circle", smoke: "mdi:smoke-detector",
+                humidity: "mdi:water-percent", pressure: "mdi:gauge",
+                power: "mdi:flash", temperature: "mdi:thermometer",
+                volatile_organic_compounds: "mdi:molecule", duration: "mdi:calendar-clock",
+            }[this.getEntityAttribute(entityId, "device_class")] ||
+            {
+                fan: "mdi:fan", binary_sensor: "mdi:checkbox-marked-circle",
+            }[domain] ||
+            "mdi:eye";
+    }
+
+    private getUnitStateIcon(unitState : string) {
+        const iconMap = {
+            'bypass': 'mdi:arrow-right-top-bold', 'defrost': 'mdi:snowflake-melt',
+            'humidity recovery': 'mdi:water-percent', 'fireplace mode': 'mdi:fireplace',
+        }
+        return iconMap[unitState?.toLowerCase()] || 'mdi:swap-horizontal-bold';
+    }
+
+
+    private showEntityInfo(entityId: string) {
         const event = new Event("hass-more-info", {
-            bubbles: true,
-            cancelable: false,
-            composed: true,
+            bubbles: true, cancelable: false, composed: true,
         });
-
-        (event as any).detail = {
-            entityId: entity,
-        };
-
+        (event as any).detail = { entityId };
         this.dispatchEvent(event);
-
         return event;
     }
 
-    private printableValue(airSensor) : string {
-        let state = this.hass.states[airSensor];
-        return (state ? (state.attributes.unit_of_measurement ? `${state.state} ${state.attributes.unit_of_measurement}` : state.state) : '-');
+    private setPresetMode(presetMode: string) {
+        if (!this.hass || !this.config?.entities?.ventilation_unit) return;
+        this.hass.callService(
+            "fan", "set_preset_mode",
+            { preset_mode: presetMode },
+            { entity_id: this.config.entities.ventilation_unit }
+        );
     }
 
     private renderTemperature(sensor, label) {
-        return html`
+        return html `
             <div>
                 <div class="dfvc-temp-label">${label}</div>
-                <div class="dfvc-temp-value" @click="${ () => this.showEntityInfo(sensor) }">${this.printableValue(sensor)}</div>
-            </div>`;
+                <div class="dfvc-temp-value" @click="${() => this.showEntityInfo(sensor)}">
+                    ${this.getEntityValue(sensor) || "-"}
+                </div>
+            </div>
+        `;
     }
 
-    private renderExchangerState() {
+    private renderEntityInfo(entity, value) {
+        return entity ? html `<span @click="${() => this.showEntityInfo(entity)}">${value}</span>` : value;
+    }
+
+    private renderExchangerImage() {
         return html `
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="50" height="50" viewBox="0 0 50 50" xml:space="preserve">
-
                 <desc>Created with Fabric.js 4.6.0</desc>
-
-                <g transform="matrix(0.62 0 0 0.53 24 25)" id="tRjiNB6GNj8ZKCBHF_5um"  >
-                <path style="stroke: rgb(114,114,114); stroke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(242,242,242); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(0, 0)" d="M 16.23943 -28.12732 L 32.47864 0 L 16.23943 28.12732 L -16.23943 28.12732 L -32.47864 0 L -16.23943 -28.12732 z" stroke-linecap="round" />
-                </g>
-
-                <g transform="matrix(0.2 0 0 0.3 25.5 24)" id="MsTeVBfavi5luTNjGOiGS"  >
-                <path style="stroke: rgb(49,168,247); stroke-width: 4; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-opacity: 0; fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(0, 0)" d="M -110 40 L -90 40 L 90 -40 L 110 -40" stroke-linecap="round" />
-                </g>
-
-                <g transform="matrix(0 -0.1 0.06 0 2.5 36)" id="ZQElss-eOJlMrdixjCwS7"  >
-                <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(49,168,247); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-40, -40)" d="M 60 40 L 80 80 L 40 80 L 0 80 L 20 40 L 40 0 L 60 40 z" stroke-linecap="round" />
-                </g>
-
-                <g transform="matrix(0 -0.1 -0.06 0 47.5 36)" id="tJXkie3lntCwzfM0th5MP"  >
-                <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(49,168,247); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-40, -40)" d="M 60 40 L 80 80 L 40 80 L 0 80 L 20 40 L 40 0 L 60 40 z" stroke-linecap="round" />
-                </g>
-
-                <g transform="matrix(-0.19 0 0 0.3 24 24)" id="RR9eEmjzxuPtw2nl0KhXz"  >
-                <path style="stroke: rgb(49,168,247); stroke-width: 4; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(0, 0)" d="M -110 40 L -90 40 L 90 -40 L 110 -40" stroke-linecap="round" />
-                </g>
-
+                <g transform="matrix(0.62 0 0 0.53 24 25)" id="tRjiNB6GNj8ZKCBHF_5um"><path style="stroke: rgb(114,114,114); stroke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(242,242,242); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(0, 0)" d="M 16.23943 -28.12732 L 32.47864 0 L 16.23943 28.12732 L -16.23943 28.12732 L -32.47864 0 L -16.23943 -28.12732 z" stroke-linecap="round" /></g>
+                <g transform="matrix(0.2 0 0 0.3 25.5 24)" id="MsTeVBfavi5luTNjGOiGS"><path style="stroke: rgb(49,168,247); stroke-width: 4; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-opacity: 0; fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(0, 0)" d="M -110 40 L -90 40 L 90 -40 L 110 -40" stroke-linecap="round" /></g>
+                <g transform="matrix(0 -0.1 0.06 0 2.5 36)" id="ZQElss-eOJlMrdixjCwS7"><path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(49,168,247); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-40, -40)" d="M 60 40 L 80 80 L 40 80 L 0 80 L 20 40 L 40 0 L 60 40 z" stroke-linecap="round" /></g>
+                <g transform="matrix(0 -0.1 -0.06 0 47.5 36)" id="tJXkie3lntCwzfM0th5MP"><path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(49,168,247); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-40, -40)" d="M 60 40 L 80 80 L 40 80 L 0 80 L 20 40 L 40 0 L 60 40 z" stroke-linecap="round" /></g>
+                <g transform="matrix(-0.19 0 0 0.3 24 24)" id="RR9eEmjzxuPtw2nl0KhXz"><path style="stroke: rgb(49,168,247); stroke-width: 4; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(0, 0)" d="M -110 40 L -90 40 L 90 -40 L 110 -40" stroke-linecap="round" /></g>
             </svg>
         `;
     }
 
     public render() : TemplateResult {
-
-        if (!this.config || !this.hass) {
-            return html``;
+        if (!this.hass || !this.config) {
+            return html ``;
         }
 
-        const currentPresetEntity = this.hass.states[this.config.current_preset_entity];
-        const currentPreset = currentPresetEntity ? currentPresetEntity.state : '';
+        const entities: { entity: string, value: string }[] = [];
+        const additionalEntity = this.config.entities?.additional_entity;
+        if (additionalEntity) {
+            entities.push({
+                entity: additionalEntity,
+                value: this.getEntityValue(additionalEntity)
+            });
+        }
+        const ventilationUnit = this.config.entities?.ventilation_unit;
+        if (ventilationUnit) {
+            entities.push({
+                entity: ventilationUnit,
+                value: this.getEntityAttribute(ventilationUnit, "percentage") + " %"
+            });
+        }
 
-        const presets = [
-            { preset: 'Away', icon: 'home-off-outline' },
-            { preset: 'Home', icon: 'home' },
-            { preset: 'Boost', icon: 'flash' }
-        ];
+        const presets: { mode: string, icon: string }[] = [];
+        if (ventilationUnit && this.config?.presets) {
+            ["left", "middle", "right"].forEach((button) => {
+                presets.push({
+                    mode: this.config?.presets?.[`${button}_mode`],
+                    icon: this.config?.presets?.[`${button}_icon`]
+                });
+            });
+        }
 
-        const entities = [
-            //{ entity: this.config.efficiency_entity, icon: 'gauge' },
-            //{ entity: this.config.cell_state_entity, icon: 'swap-horizontal-bold' },
-            { entity: this.config.humidity_entity, icon: 'water-percent' },
-            { entity: this.config.fan_speed_entity, icon: 'fan' },
-        ];
+        let efficiency = 0;
+        let unitState = "Heat Recovery";
+        if (this.config.entities?.ventilation_unit_efficiency) {
+            efficiency = this.getStateValue(this.config.entities?.ventilation_unit_efficiency);
+        }
+        const temps = this.config.temperatures;
+        if (temps?.outdoor_air && temps?.extract_air) {
+            const outdoorAir = this.getStateValue(temps.outdoor_air);
+            const extractAir = this.getStateValue(temps.extract_air);
+            if (efficiency == 0 && temps?.supply_air) {
+                const supplyAir = this.getStateValue(temps.supply_air);
+                const gain = supplyAir - outdoorAir;
+                const potential = extractAir - outdoorAir;
+                const rawEfficiency = potential !== 0 ? (gain / potential) * 100 : 0;
+                efficiency = Math.max(0, Math.min(100, rawEfficiency));
+            }
+            if (outdoorAir > extractAir) {
+                unitState = "Cooling Recovery";
+            }
+        }
+        unitState = this.config.entities?.ventilation_unit_state ?
+            this.hass.states[this.config.entities.ventilation_unit_state]?.state : unitState;
 
-        let cell_state_entity = this.config.cell_state_entity;
-        let efficiency_entity = this.config.efficiency_entity;
-
-        return html`<ha-card>
+        return html `
+            <ha-card>
                 <div class="card-content">
-                    <div class="dfvc-control-panel">
+                    <div class="dfvc-control-panel${(ventilationUnit || additionalEntity) ? " dfvc-control-panel-columns" : ""}">
                         <div class="dfvc-overview">
                             <div class="dfvc-temperatures">
                                 <div class="dfvc-temperatures-left">
-                                    ${this.renderTemperature(this.config.extract_air_entity, 'Extract Air')}
-                                    ${this.renderTemperature(this.config.supply_air_entity, 'Supply Air')}
+                                    ${this.renderTemperature(this.config.temperatures?.outdoor_air, "Outdoor Air")}
+                                    ${this.renderTemperature(this.config.temperatures?.exhaust_air, "Exhaust Air")}
                                 </div>
                                 <div class="dfvc-temperatures-center">
-                                    ${this.renderExchangerState()}
+                                    ${this.renderExchangerImage()}
                                 </div>
                                 <div class="dfvc-temperatures-right">
-                                    ${this.renderTemperature(this.config.outdoor_air_entity, 'Outside Air')}
-                                    ${this.renderTemperature(this.config.exhaust_air_entity, 'Exhaust Air')}
+                                    ${this.renderTemperature(this.config.temperatures?.extract_air, "Extract Air")}
+                                    ${this.renderTemperature(this.config.temperatures?.supply_air, "Supply Air")}
                                 </div>
                             </div>
                             <div class="dfvc-cells-state">
-                                <span @click="${ () => this.showEntityInfo(cell_state_entity) }">
-                                    <ha-icon icon="mdi:swap-horizontal-bold"></ha-icon>
-                                    ${this.printableValue(cell_state_entity)} (Efficiency ${this.printableValue(efficiency_entity)})
-                                </span>
-                            </div>
+                                <ha-icon icon="${this.getUnitStateIcon(unitState)}"></ha-icon>
+                                ${this.renderEntityInfo(this.config.entities?.ventilation_unit_state, unitState)} (Efficiency
+                                ${this.renderEntityInfo(this.config.entities?.ventilation_unit_efficiency, efficiency.toFixed(1) + " %")})
+                           </div>
                         </div>
                         <div class="dfvc-entities">
-                            ${entities.map(i => html`
-                                <div class="dfvc-entity" @click="${ () => this.showEntityInfo(i.entity) }">
-                                    <div class="dfvc-icon"><ha-icon icon="mdi:${i.icon}"></ha-icon></div>
-                                    <div class="dfvc-value">${this.printableValue(i.entity)}</div>
-                                </div>`)}
+                        ${entities.map(i => html `
+                            <div class="dfvc-entity" @click="${() => this.showEntityInfo(i.entity)}">
+                                <div class="dfvc-icon"><ha-icon icon="${this.getEntityIcon(i.entity)}"></ha-icon></div>
+                                <div class="dfvc-value">${i.value}</div>
+                            </div>
+                        `)}
                         </div>
                     </div>
-
-                    <div class="dfvc-profiles">
-                        ${presets.map(i =>  html`
-                            <button class="${ currentPreset == i.preset ? 'selected' : '' }"
-                                @click=${() => this.setPresetMode(i.preset)}><ha-icon icon="mdi:${i.icon}"></ha-icon>${i.preset}
-                            </button>`)}
+                    <div class="dfvc-presets">
+                    ${presets.map(i =>  html `
+                        <button class="${this.getEntityAttribute(this.config?.entities?.ventilation_unit, 'preset_mode') == i.mode ? 'selected' : ''}"
+                                @click="${() => this.setPresetMode(i.mode)}">
+                            <ha-icon icon="${i.icon}"></ha-icon>${i.mode}
+                        </button>
+                    `)}
                     </div>
                 </div>
-            </ha-card>`;
-    }
-
-    // The user supplied configuration. Throw an exception and Lovelace will
-    // render an error card.
-    setConfig(config : DualFlowVentilationCardConfig) {
-        this.config = config;
-    }
-
-    // The height of your card. Home Assistant uses this to automatically
-    // distribute all cards over the available columns.
-    getCardSize() {
-        return 3;
-    }
-
-    setPresetMode(preset : string) {
-        if (!this.config || !this.hass || !this.config.fan_entity) return;
-
-        console.log(`Changing preset to ${preset}`);
-        this.hass.callService('fan', 'set_preset_mode', { preset_mode: preset }, { entity_id: this.config.fan_entity });
+            </ha-card>
+        `;
     }
 
     static get styles() {
         return css`
             .dfvc-control-panel {
                 display: grid;
-                grid-template-columns: auto 30%;
                 border-radius: 12px;
                 border: medium none;
                 background-color: rgba(var(--rgb-primary-text-color), 0.05);
                 margin-bottom: 12px;
                 padding: 12px
+            }
+            .dfvc-control-panel-columns {
+                grid-template-columns: auto 30%;
             }
             .dfvc-temperatures {
                 display: grid;
@@ -205,6 +249,9 @@ export class DualFlowVentilationCard extends LitElement {
             }
             .dfvc-cells-state {
                 text-align: center;
+            }
+            .dfvc-cells-state > span {
+                cursor: pointer;
             }
             .dfvc-temperatures-left > div, .dfvc-temperatures-right > div {
                 padding: 10px;
@@ -233,10 +280,10 @@ export class DualFlowVentilationCard extends LitElement {
                 padding-left: 20px;
                 align-self: center;
             }
-            .dfvc-profiles {
+            .dfvc-presets {
                 display: flex;
             }
-            .dfvc-profiles > button {
+            .dfvc-presets > button {
                 cursor: pointer;
                 display: flex;
                 align-items: center;
@@ -254,14 +301,14 @@ export class DualFlowVentilationCard extends LitElement {
                 box-sizing: border-box;
                 line-height: 0;
             }
-            .dfvc-profiles > button.selected {
+            .dfvc-presets > button.selected {
                 color: #555;
                 background: #eee;
               }
-            .dfvc-profiles > button > ha-icon {
+            .dfvc-presets > button > ha-icon {
                 margin-right: 12px;
             }
-            .dfvc-profiles > button:not(:last-child)
+            .dfvc-presets > button:not(:last-child)
             {
               margin-right: 12px;
             }
@@ -272,7 +319,10 @@ export class DualFlowVentilationCard extends LitElement {
 // Register the card with Home Assistant
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
-    type: 'dual-flow-ventilation-card',
-    name: 'Dual Flow Ventilation Card',
-    description: 'A card for dual flow ventilation systems'
+    type: "dual-flow-ventilation-card",
+    name: "Dual Flow Ventilation Card",
+    description: "Simple card to display information related to a Dual Flow ventilation system",
+    documentationURL: "https://github.com/wolandmaster/ha-dualflowventilation-card"
 });
+
+// vim: set ts=4 sw=4 et:

@@ -5,6 +5,7 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 import serve from "rollup-plugin-serve";
+import { minifyTemplateLiterals } from 'rollup-plugin-minify-template-literals';
 
 const dev = process.env.ROLLUP_WATCH;
 
@@ -21,6 +22,9 @@ const serveOptions = {
 const plugins = [
     typescript({
         declaration: false,
+    }),
+    minifyTemplateLiterals({
+        failOnError: true,
     }),
     nodeResolve(),
     json(),

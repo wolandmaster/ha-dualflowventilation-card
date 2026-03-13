@@ -11,7 +11,7 @@ Simple lovelace card for Home Assistant to display information related to a Dual
 
 ### HACS
 
-* Go to HACS > Frontend
+* Go to HACS
 * Click the triple dots on the top-right corner and choose **Custom repositories**
 * Add **https://github.com/wolandmaster/ha-dualflowventilation-card** with type **Dashboard**
 * Click **Add**
@@ -27,5 +27,5 @@ TODO
 
 ## Test
 
-By running the `test_ha_start.sh` script, you can launch a Home Assistant instance in Docker to test the Dual Flow Ventilation Card.
-The launched HA is available at the URL http://localhost:8123/ with credentials: test/test.
+By running the `test_ha.sh` script, you can start Home Assistant in a local Docker container to test the Dual Flow Ventilation Card.
+The launched HA is reachable at the URL http://localhost:8123/ using the login credentials: _test/test_.

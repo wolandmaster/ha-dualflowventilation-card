@@ -17,27 +17,42 @@
                 },
                 {
                   "type": "custom:dual-flow-ventilation-card",
-                  "outdoor_air_entity": "input_number.outdoor_air",
-                  "supply_air_entity": "input_number.supply_air",
-                  "extract_air_entity": "input_number.extract_air",
-                  "exhaust_air_entity": "input_number.exhaust_air",
-                  "fan_speed_entity": "input_number.fan_speed",
-                  "humidity_entity": "input_number.humidity",
-                  "efficiency_entity": "input_number.efficiency",
-                  "cell_state_entity": "input_text.cell_state",
-                  "current_preset_entity": "input_text.fan",
-                  "fan_entity": [
-                    {
-                      "target": {
-                        "entity_id": "input_text.fan"
-                      },
-                      "action": "input_text.set_value",
-                      "metadata": {},
-                      "data": {
-                        "value": "value"
-                      }
-                    }
-                  ]
+                  "temperatures": {
+                    "outdoor_air": "input_number.outdoor_air",
+                    "extract_air": "input_number.extract_air",
+                    "exhaust_air": "input_number.exhaust_air",
+                    "supply_air": "input_number.supply_air"
+                  },
+                  "entities": {
+                    "ventilation_unit": "fan.ventilation_unit",
+                    "additional_entity": "input_number.humidity",
+                    "ventilation_unit_state": "input_select.unit_state",
+                    "ventilation_unit_efficiency": "input_number.efficiency"
+                  },
+                  "presets": {
+                    "left_mode": "Away",
+                    "left_icon": "mdi:home-off-outline",
+                    "middle_mode": "Home",
+                    "middle_icon": "mdi:home",
+                    "right_mode": "Boost",
+                    "right_icon": "mdi:flash"
+                  }
+                },
+                {
+                  "type": "entity",
+                  "entity": "input_select.preset_mode"
+                },
+                {
+                  "type": "entity",
+                  "entity": "input_number.speed"
+                },
+                {
+                  "type": "entity",
+                  "entity": "input_select.unit_state"
+                },
+                {
+                  "type": "entity",
+                  "entity": "input_number.efficiency"
                 }
               ]
             }

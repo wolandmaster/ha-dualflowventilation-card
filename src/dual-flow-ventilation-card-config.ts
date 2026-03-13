@@ -1,13 +1,30 @@
-export interface DualFlowVentilationCardConfig
-{
-    fan_entity: any;
-    exhaust_air_entity: any;
-    outdoor_air_entity: any;
-    fan_speed_entity: any;
-    humidity_entity: any;
-    cell_state_entity: any;
-    efficiency_entity: any;
-    supply_air_entity: any;
-    extract_air_entity: any;
-    current_preset_entity: any;
+export interface DualFlowVentilationCardConfig {
+    temperatures?: TemperaturesConfig;
+    entities?: EntitiesConfig;
+    presets?: PresetsConfig;
 };
+
+export interface TemperaturesConfig {
+    extract_air?: any;
+    outdoor_air?: any;
+    supply_air?: any;
+    exhaust_air?: any;
+};
+
+export interface EntitiesConfig {
+    ventilation_unit?: any;
+    additional_entity?: any;
+    ventilation_unit_state?: any;
+    ventilation_unit_efficiency?: any;
+};
+
+export interface PresetsConfig {
+    left_mode?: string;
+    left_icon?: string;
+    middle_mode?: string;
+    middle_icon?: string;
+    right_mode?: string;
+    right_icon?: string;
+};
+
+// vim: set ts=4 sw=4 et:

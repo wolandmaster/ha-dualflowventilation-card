@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "minor_version": 2,
+  "key": "input_select",
+  "data": {
+    "items": [
+      {
+        "id": "preset_mode",
+        "name": "Preset mode",
+        "initial": "Away",
+        "options": [
+          "Away",
+          "Home",
+          "Boost"
+        ]
+      },
+      {
+        "id": "unit_state",
+        "name": "Unit state",
+        "initial": "Heat Recovery",
+        "options": [
+          "Heat Recovery",
+          "Humidity Recovery",
+          "Cooling Recovery",
+          "Bypass",
+          "Defrost",
+          "Fireplace Mode"
+        ]
+      }
+    ]
+  }
+}
